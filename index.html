@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Heart For You</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+    body {
+      background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+      padding: 20px;
+    }
+
+    .container { width: 100%; max-width: 500px; text-align: center; }
+    .title { color: #d13b76; font-size: 2.5rem; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
+    .subtitle { color: #7c2c5f; font-size: 1.2rem; margin-bottom: 20px; }
+
+    .hearts { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
+    .heart { position: absolute; font-size: 20px; color: rgba(209,59,118,0.7); animation: float 6s ease-in-out infinite; }
+
+    .login-form { background: rgba(255,255,255,0.9); border-radius: 15px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 15px; }
+    .form-group { margin-bottom: 20px; text-align: left; }
+    label { display: block; margin-bottom: 8px; color: #7c2c5f; font-weight: 600; }
+    input { width: 100%; padding: 12px 15px; border: 2px solid #fad0c4; border-radius: 8px; font-size: 16px; }
+    input:focus { outline: none; border-color: #d13b76; }
+
+    .btn { background: linear-gradient(to right, #d13b76, #ff6b6b); color: white; border: none; padding: 12px 30px; border-radius: 30px; font-size: 16px; font-weight: 600; cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; }
+    .btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(209,59,118,0.4); }
+
+    .hint { margin-top: 10px; font-size: 14px; cursor: pointer; color: #7c2c5f; text-decoration: underline; }
+
+    .surprise-container { display: none; width: 100%; max-width: 800px; perspective: 1000px; }
+    .envelope { position: relative; width: 300px; height: 200px; margin: 0 auto 20px; cursor: pointer; transition: transform 0.5s; }
+    .envelope:hover { transform: scale(1.05); }
+
+    .envelope-front, .envelope-back {
+      position: absolute; width: 100%; height: 100%; border-radius: 10px;
+    }
+    .envelope-front {
+      background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+      display:flex; justify-content:center; align-items:center; z-index:2;
+      transform-origin: bottom; transition: transform 0.5s;
+    }
+    .envelope-back {
+      background: linear-gradient(135deg,#fad0c4 0%,#ff9a9e 100%); z-index:1;
+    }
+    .envelope-heart { font-size: 60px; color: #d13b76; }
+    .envelope.open .envelope-front { transform: rotateX(180deg); z-index:0; }
+
+    .envelope-content {
+      display: none;
+      margin-top: -50px; /* makes it look inside envelope */
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      animation: fadeIn 1s ease forwards;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px);} to {opacity:1; transform: translateY(0);} }
+
+    .letter { margin-bottom: 10px; text-align: left; line-height: 1.6; color: #333; }
+    .letter h2 { color: #d13b76; margin-bottom: 15px; text-align: center; }
+
+    .popup { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,192,203,0.6); backdrop-filter: blur(3px); justify-content:center; align-items:center; z-index:1000; }
+    .popup-content { background:white; padding:25px 35px; border-radius:20px; text-align:center; box-shadow:0 8px 20px rgba(209,59,118,0.3); max-width:320px; }
+    .popup-icon { font-size:40px; margin-bottom:15px; display:block; }
+    .popup-content p { font-size:16px; color:#7c2c5f; margin-bottom:20px; }
+  </style>
+</head>
+<body>
+  <div class="hearts" id="hearts"></div>
+
+  <!-- Login -->
+  <div class="container" id="loginContainer">
+    <h1 class="title floating">My Heart For You</h1>
+    <p class="subtitle">Please enter your details to unlock my love</p>
+    <div class="login-form pulse">
+      <div class="form-group">
+        <label for="username"><i class="fas fa-user"></i> Your Name</label>
+        <input type="text" id="username" placeholder="Enter your Nickname">
+      </div>
+      <div class="form-group">
+        <label for="password"><i class="fas fa-lock"></i> Password</label>
+        <input type="password" id="password" placeholder="Enter our Special Date">
+      </div>
+      <button class="btn" id="loginBtn"><i class="fas fa-heart"></i> Open My Heart</button>
+      <div class="hint" id="hintBtn">Need a clue? 💡</div>
+    </div>
+  </div>
+
+  <!-- Surprise -->
+  <div class="surprise-container" id="surpriseContainer">
+    <h2 class="title">For You, My Honey</h2>
+    <p class="subtitle">pindutin mo hehe 💌</p>
+    <div class="envelope" id="envelope">
+      <div class="envelope-front"><div class="envelope-heart"><i class="fas fa-heart"></i></div></div>
+      <div class="envelope-back"></div>
+    </div>
+    <div class="envelope-content" id="envelopeContent">
+      <div class="letter">
+        <h2>My Honey,</h2>
+        <p>Honey, First of all I Love You So Much. Even though kalimitan Malala ang away natin hehe Sorry po.
+I'm so happy to be with you all the time. And I Soo lucky to be with you honey.</p>
+        <p>Kahit na di natin alam pano tayo nagkakilala nung g8 at sobrang daming nang yare sa buhay natin matapos yun. </p>
+        <p>Di natin expected na in the end of kulitan na friend na walang aminan mga shifting satin na kala eh di magiging totoo. and ending ikaw den pala at ako. Ang tam es. I love you sooo much. mahal na mahal kita and kaya po natin kahit anong problema tiwala lang po.</p>
+        <p>I'm Forever yours, Honey ❤️</p>
+        <p>Your Honey, Ryan.</p>
+        <p>Happy First Monthsarry honey. I Love You So Much</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popup -->
+  <div id="popup" class="popup">
+    <div class="popup-content">
+      <i id="popupIcon" class="fas fa-heart popup-icon"></i>
+      <p id="popupMessage"></p>
+      <button class="btn" id="popupClose">Okay 💕</button>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Floating hearts
+      const heartsContainer = document.getElementById("hearts");
+      for (let i = 0; i < 25; i++) {
+        const heart = document.createElement("div");
+        heart.classList.add("heart");
+        heart.innerHTML = '<i class="fas fa-heart"></i>';
+        heart.style.left = Math.random() * 100 + "vw";
+        heart.style.top = Math.random() * 100 + "vh";
+        heart.style.fontSize = Math.random() * 20 + 10 + "px";
+        heart.style.animationDelay = Math.random() * 5 + "s";
+        heartsContainer.appendChild(heart);
+      }
+
+      const loginBtn = document.getElementById("loginBtn");
+      const loginContainer = document.getElementById("loginContainer");
+      const surpriseContainer = document.getElementById("surpriseContainer");
+
+      const popup = document.getElementById("popup");
+      const popupMessage = document.getElementById("popupMessage");
+      const popupIcon = document.getElementById("popupIcon");
+      const popupClose = document.getElementById("popupClose");
+
+      const correctUsername = "My Honey";
+      const correctPassword = "08152025";
+
+      function showPopup(msg, success=false) {
+        popupMessage.textContent = msg;
+        if(success) {
+          popupIcon.className = "fas fa-heart popup-icon";
+          popupIcon.style.color = "#d13b76";
+        } else {
+          popupIcon.className = "fas fa-heart-broken popup-icon";
+          popupIcon.style.color = "crimson";
+        }
+        popup.style.display = "flex";
+      }
+      function hidePopup() { popup.style.display = "none"; }
+      popupClose.addEventListener("click", hidePopup);
+
+      loginBtn.addEventListener("click", () => {
+        const username = document.getElementById("username").value.trim();
+        const password = document.getElementById("password").value.trim();
+
+        if(!username || !password) {
+          showPopup("Please enter both your name and our special word 💕");
+          return;
+        }
+        if(username === correctUsername && password === correctPassword) {
+          loginContainer.style.display = "none";
+          surpriseContainer.style.display = "block";
+          showPopup("Welcome, My Honey 💖 You unlocked my heart!", true);
+        } else {
+          showPopup("Oops! Wrong name or password 💔 Try again, my love!");
+        }
+      });
+
+      // Envelope reveal
+      const envelope = document.getElementById("envelope");
+      const envelopeContent = document.getElementById("envelopeContent");
+      envelope.addEventListener("click", () => {
+        envelope.classList.add("open");
+        setTimeout(()=> envelopeContent.style.display="block", 600);
+      });
+
+      // Hint button
+      const hintBtn = document.getElementById("hintBtn");
+      hintBtn.addEventListener("click", () => {
+        showPopup("Hint 💡: The username is something sweet I call you, and the password is a very special date 💕");
+      });
+    });
+  </script>
+</body>
+</html>
